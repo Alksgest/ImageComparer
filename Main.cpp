@@ -25,24 +25,69 @@ int main()
 		unsigned char* rgb1 = stbi_load(hardcodedPath1, &width1, &height1, &bpp1, 0);
 		unsigned char* rgb2 = stbi_load(hardcodedPath2, &width2, &height2, &bpp2, 0);
 		unsigned char* comparedImage = nullptr;
-
+		unsigned int* rgb1Int = nullptr;
+		unsigned int* rgb2Int = nullptr;
+		unsigned int* rgb3Int = nullptr;
 		if (rgb1 == nullptr || rgb2 == nullptr) return -1;
-		else 
+		else
 		{
+			rgb1Int = new unsigned int[width1 * height1 * bpp1 / 4];
+			rgb2Int = new unsigned int[width2 * height2 * bpp2 / 4];
+
+			rgb3Int = new unsigned int[width1 * height1 * bpp1 / 4];
+
 			comparedImage = new unsigned char[width1 * height1 * bpp1];
-			for (int i = 0; i < width1 * height1 * 3; ++i)
+
+			int enumerator = 0;
+			//for (int i = 0; i < width1 * height1 * bpp1; i += 4)
+			//{
+			//	++enumerator;
+			//	rgb1Int[enumerator] = (rgb1[i] << 24) | (rgb1[i + 1] << 16) | (rgb1[i + 2]) << 8 | (rgb1[i + 3]);
+
+			//}
+
+			//enumerator = 0;
+			//for (int i = 0; i < width2 * height2 * bpp2; i += 4)
+			//{
+			//	++enumerator;
+			//	rgb2Int[enumerator] = (rgb2[i] << 24) | (rgb2[i + 1] << 16) | (rgb2[i + 2] << 8) | (rgb2[i + 3]);
+			//}
+			//for (int i = 0; i < width1 * height1 * bpp1 / 4; ++i)
+			//{
+			//	if ((rgb1Int[i] ^ rgb2Int[i]))
+			//		rgb3Int[i] = rgb1Int[i];
+			//	else
+			//		rgb3Int[i] = 0;
+			//}
+
+			for (int i = 0; i < width1 * height1 * bpp1; i += 4)
 			{
-				if ((rgb1[i] ^ rgb2[i]))
-					comparedImage[i] = rgb1[i];
-				else
-					comparedImage[i] = 0;
+				if ((rgb1[i] << 24) | (rgb1[i + 1] << 16) | (rgb1[i + 2]) << 8 | (rgb1[i + 3]) ^
+					(rgb2[i] << 24) | (rgb2[i + 1] << 16) | (rgb2[i + 2] << 8) | (rgb2[i + 3]))
+				{
+					comparedImage[i] = (rgb1[i] << 24) & 0xFF;
+					comparedImage[i - 1] = (rgb1[i + 1] << 16) & 0xFF;
+					comparedImage[i - 2] = ((rgb1[i + 2]) << 8) & 0xFF;
+					comparedImage[i - 3] = (rgb1[i + 3]) & 0xFF;
+				}
 			}
 		}
+		//int num = 0;
+		//for(int i = 0 ; i < width1 * height1 * bpp1 / 4; ++i)
+		//{
+		//	comparedImage[num + 1] = (rgb3Int[i] >> 24) & 0xFF;
+		//	comparedImage[num + 2] = (rgb3Int[i] >> 16) & 0xFF;
+		//	comparedImage[num + 3] = (rgb3Int[i] >> 8) & 0xFF;
+		//	comparedImage[num + 4] = (rgb3Int[i]) & 0xFF;
+		//	num += 4;
+		//}
+
+
 		int result = stbi_write_jpg(hardcodedPath3, width1, height1, bpp1, comparedImage, 100);
 
 		stbi_image_free(rgb1);
 		stbi_image_free(rgb2);
-		stbi_image_free(comparedImage);
+		//stbi_image_free(comparedImage);
 
 		std::cout << "Work has finished!" << std::endl;
 		return 0;
